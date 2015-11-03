@@ -79,9 +79,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     is: 'paper-input-light',
 
     behaviors: [
-      Polymer.IronFormElementBehavior,
-      Polymer.PaperInputBehavior
+      Polymer.PaperInputLightBehavior
     ],
+
+    // beforeRegister: function() {
+    //   // Use a paper-input template.
+    //   var template =
+    //       Polymer.DomModule.import('paper-input--light-template', 'template').cloneNode(true);
+    //   this._template = template;
+    // },
 
     ready: function() {
       this.addEventListener('input', this._onInput);

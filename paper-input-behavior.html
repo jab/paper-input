@@ -22,7 +22,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * properties or methods that are not exposed.
    * @polymerBehavior Polymer.PaperInputBehavior
    */
-  Polymer.PaperInputBehaviorLightImpl = {
+
+  Polymer.PaperInputBehaviorTinyImpl = {
 
     properties: {
       /**
@@ -57,6 +58,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       /**
+       * The type of the input. The supported types are `text`, `number` and `password`. Bind this
+       * to the `<input is="iron-input">`'s `type` property.
+       */
+      type: {
+        type: String
+      },
+
+      /**
+       * Set to true to disable the floating label. Bind this to the `<paper-input-container>`'s
+       * `noLabelFloat` property.
+       */
+      noLabelFloat: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Set to true to always float the label. Bind this to the `<paper-input-container>`'s
+       * `alwaysFloatLabel` property.
+       */
+      alwaysFloatLabel: {
+        type: Boolean,
+        value: false
+      },
+
+      _ariaDescribedBy: {
+        type: String,
+        value: ''
+      }
+    },
+
+    attached: function() {
+      this._updateAriaLabelledBy();
+    },
+
+    _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
+      return placeholder || alwaysFloatLabel;
+    },
+
+    _updateAriaLabelledBy: function() {
+      var label = Polymer.dom(this.root).querySelector('label');
+      if (!label) {
+        this._ariaLabelledBy = '';
+        return;
+      }
+      var labelledBy;
+      if (label.id) {
+        labelledBy = label.id;
+      } else {
+        labelledBy = 'paper-input-label-' + new Date().getUTCMilliseconds();
+        label.id = labelledBy;
+      }
+      this._ariaLabelledBy = labelledBy;
+    },
+
+    _onChange:function(event) {
+      // In the Shadow DOM, the `change` event is not leaked into the
+      // ancestor tree, so we must do this manually.
+      // See https://w3c.github.io/webcomponents/spec/shadow/#events-that-are-not-leaked-into-ancestor-trees.
+      if (this.shadowRoot) {
+        this.fire(event.type, {sourceEvent: event}, {
+          node: this,
+          bubbles: event.bubbles,
+          cancelable: event.cancelable
+        });
+      }
+    }
+
+  };
+
+  Polymer.PaperInputBehaviorLightImpl = {
+
+    properties: {
+      /**
        * Returns true if the value is invalid. Bind this to both the `<paper-input-container>`'s
        * and the input's `invalid` property.
        */
@@ -79,14 +154,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * `<input is="iron-input">`'s `allowedPattern` property.
        */
       allowedPattern: {
-        type: String
-      },
-
-      /**
-       * The type of the input. The supported types are `text`, `number` and `password`. Bind this
-       * to the `<input is="iron-input">`'s `type` property.
-       */
-      type: {
         type: String
       },
 
@@ -127,24 +194,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * Set to true to show a character counter.
        */
       charCounter: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Set to true to disable the floating label. Bind this to the `<paper-input-container>`'s
-       * `noLabelFloat` property.
-       */
-      noLabelFloat: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Set to true to always float the label. Bind this to the `<paper-input-container>`'s
-       * `alwaysFloatLabel` property.
-       */
-      alwaysFloatLabel: {
         type: Boolean,
         value: false
       },
@@ -305,11 +354,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       multiple: {
         type: Boolean
-      },
-
-      _ariaDescribedBy: {
-        type: String,
-        value: ''
       }
 
     },
@@ -319,10 +363,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      */
     get inputElement() {
       return this.$.input;
-    },
-
-    attached: function() {
-      this._updateAriaLabelledBy();
     },
 
     _appendStringWithSpace: function(str, more) {
@@ -371,41 +411,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Just set the value and give up on the caret.
         this.value = newValue;
       }
-    },
-
-    _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
-      return placeholder || alwaysFloatLabel;
-    },
-
-    _updateAriaLabelledBy: function() {
-      var label = Polymer.dom(this.root).querySelector('label');
-      if (!label) {
-        this._ariaLabelledBy = '';
-        return;
-      }
-      var labelledBy;
-      if (label.id) {
-        labelledBy = label.id;
-      } else {
-        labelledBy = 'paper-input-label-' + new Date().getUTCMilliseconds();
-        label.id = labelledBy;
-      }
-      this._ariaLabelledBy = labelledBy;
-    },
-
-    _onChange:function(event) {
-      // In the Shadow DOM, the `change` event is not leaked into the
-      // ancestor tree, so we must do this manually.
-      // See https://w3c.github.io/webcomponents/spec/shadow/#events-that-are-not-leaked-into-ancestor-trees.
-      if (this.shadowRoot) {
-        this.fire(event.type, {sourceEvent: event}, {
-          node: this,
-          bubbles: event.bubbles,
-          cancelable: event.cancelable
-        });
-      }
     }
-
   };
 
   Polymer.PaperInputBehaviorHeavyImpl = {
@@ -450,10 +456,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   /** @polymerBehavior */
   Polymer.PaperInputBehavior = [Polymer.IronControlState,
+                                Polymer.PaperInputBehaviorTinyImpl,
                                 Polymer.PaperInputBehaviorLightImpl,
                                 Polymer.PaperInputBehaviorHeavyImpl];
   Polymer.PaperInputLightBehavior = [Polymer.IronControlState,
+                                     Polymer.PaperInputBehaviorTinyImpl,
                                      Polymer.PaperInputBehaviorLightImpl];
+ Polymer.PaperInputTinyBehavior = [Polymer.IronControlState,
+                                    Polymer.PaperInputBehaviorTinyImpl];
 
 
 

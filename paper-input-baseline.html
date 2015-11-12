@@ -16,11 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style include="paper-input-container-shared-styles"></style>
     <style>
       :host {
-        display: inline-block;
-        width: 100px;
-      }
-      .input-content {
-        width: 100%;
+        display: block;
       }
 
       input::-webkit-input-placeholder,
@@ -29,7 +25,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       input:-ms-input-placeholder {
         color: var(--paper-input-container-color, --secondary-text-color);
       }
-
     </style>
 
     <div class="floated-label-placeholder" hidden$="[[noLabelFloat]]">&nbsp;</div>
@@ -37,13 +32,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="input-content">
       <label hidden$="[[!label]]"
              class$="[[_computeLabelClass(noLabelFloat,alwaysFloatLabel,focused,_hasContent)]]">[[label]]</label>
-     <template is="dom-if" if="{{focused}}">
-       <input id="input"
-         disabled$="[[disabled]]"
-         value="[[value]]"
-         placeholder$="[[placeholder]]"
-         on-change="_onChange">
-      </template>
+      <input id="input"
+        disabled$="[[disabled]]"
+        value="[[value]]"
+        placeholder$="[[placeholder]]"
+        on-change="_onChange">
     </div>
 
     <div class$="[[_computeUnderlineClass(focused)]]">
@@ -62,21 +55,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Polymer.PaperInputTinyBehavior
     ],
 
-    hostAttributes: {
-      tabindex: 0
-    },
-
     attached: function() {
-      if (this.$.input)
-        this._onInput();
-      else if (this.value) {
+      this._onInput();
 
-      }
       // Don't stomp over the user set aria label.
       if (!this.getAttribute('aria-label') && this.label) {
         this.setAttribute('aria-label', this.label);
       }
     },
+
+    // registered: function() {
+    //   for (var i in properties)
+    //     this._ensurePropertyEffect(i);
+    // }
+    //
+    // _propertyChanged: function(property, value, old) {
+    //   if (this.$.input) {
+    //     this.$.input[property] = value;
+    //   }
+    // },
 
     _onInput: function() {
       var value = this.$.input.value;

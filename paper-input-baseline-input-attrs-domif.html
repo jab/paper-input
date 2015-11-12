@@ -9,13 +9,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../polymer/polymer.html">
 
-<dom-module id="paper-input-baseline">
+<dom-module id="paper-input-baseline-input-attrs-domif">
   <template strip-whitespace>
     <div>&nbsp;</div>
 
     <div>
       <label></label>
-      <input>
+      <template is="dom-if" if="{{focused}}">
+        <input id="input"
+          disabled$="[[disabled]]"
+          value="[[value]]"
+          placeholder$="[[placeholder]]"
+          on-change="_onChange">
+      </template>
     </div>
 
     <div>
@@ -28,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <script>
   Polymer({
-    is: 'paper-input-baseline',
+    is: 'paper-input-baseline-input-attrs-domif',
 
     // attached: function() {
     //   this._onInput();

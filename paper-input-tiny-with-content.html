@@ -11,7 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="paper-input-tiny-behavior.html">
 <link rel="import" href="paper-input-container-shared-styles.html">
 
-<dom-module id="paper-input-tiny">
+<dom-module id="paper-input-tiny-with-content">
   <template strip-whitespace>
     <style include="paper-input-container-shared-styles"></style>
     <style>
@@ -37,10 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="input-content">
       <label hidden$="[[!label]]"
              class$="[[_computeLabelClass(noLabelFloat,alwaysFloatLabel,focused,_hasContent)]]">[[label]]</label>
-      <input id="input"
-         value="[[value]]"
-         placeholder$="[[placeholder]]"
-         on-change="_onChange">
+      <content></content>
     </div>
 
     <div class$="[[_computeUnderlineClass(focused)]]">
@@ -53,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <script>
   Polymer({
-    is: 'paper-input-tiny',
+    is: 'paper-input-tiny-with-content',
 
     behaviors: [
       Polymer.PaperInputTinyBehavior

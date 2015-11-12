@@ -9,13 +9,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../polymer/polymer.html">
 
-<dom-module id="paper-input-baseline">
+<dom-module id="paper-input-baseline-with-content">
   <template strip-whitespace>
     <div>&nbsp;</div>
 
     <div>
       <label></label>
-      <input>
+      <content><content>
     </div>
 
     <div>
@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <script>
   Polymer({
-    is: 'paper-input-baseline',
+    is: 'paper-input-baseline-with-content',
 
     // attached: function() {
     //   this._onInput();

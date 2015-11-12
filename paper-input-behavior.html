@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-behaviors/iron-control-state.html">
+<link rel="import" href="paper-input-tiny-behavior.html">
+
 
 <script>
 
@@ -23,40 +25,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * @polymerBehavior Polymer.PaperInputBehavior
    */
 
-  Polymer.PaperInputBehaviorTinyImpl = {
+  Polymer.PaperInputBehaviorLightImpl = {
 
     properties: {
-      /**
-       * Fired when the input changes due to user interaction.
-       *
-       * @event change
-       */
-
-      /**
-       * The label for this input. Bind this to `<paper-input-container>`'s `label` property.
-       */
-      label: {
-        type: String
-      },
-
-      /**
-       * The value for this input. Bind this to the `<input is="iron-input">`'s `bindValue`
-       * property, or the value property of your input that is `notify:true`.
-       */
-      value: {
-        notify: true,
-        type: String
-      },
-
-      /**
-       * Set to true to disable this input. Bind this to both the `<paper-input-container>`'s
-       * and the input's `disabled` property.
-       */
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-
       /**
        * The type of the input. The supported types are `text`, `number` and `password`. Bind this
        * to the `<input is="iron-input">`'s `type` property.
@@ -65,72 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         type: String
       },
 
-      /**
-       * Set to true to disable the floating label. Bind this to the `<paper-input-container>`'s
-       * `noLabelFloat` property.
-       */
-      noLabelFloat: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Set to true to always float the label. Bind this to the `<paper-input-container>`'s
-       * `alwaysFloatLabel` property.
-       */
-      alwaysFloatLabel: {
-        type: Boolean,
-        value: false
-      },
-
-      _ariaDescribedBy: {
-        type: String,
-        value: ''
-      }
-    },
-
-    attached: function() {
-      this._updateAriaLabelledBy();
-    },
-
-    _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
-      return placeholder || alwaysFloatLabel;
-    },
-
-    _updateAriaLabelledBy: function() {
-      var label = Polymer.dom(this.root).querySelector('label');
-      if (!label) {
-        this._ariaLabelledBy = '';
-        return;
-      }
-      var labelledBy;
-      if (label.id) {
-        labelledBy = label.id;
-      } else {
-        labelledBy = 'paper-input-label-' + new Date().getUTCMilliseconds();
-        label.id = labelledBy;
-      }
-      this._ariaLabelledBy = labelledBy;
-    },
-
-    _onChange:function(event) {
-      // In the Shadow DOM, the `change` event is not leaked into the
-      // ancestor tree, so we must do this manually.
-      // See https://w3c.github.io/webcomponents/spec/shadow/#events-that-are-not-leaked-into-ancestor-trees.
-      if (this.shadowRoot) {
-        this.fire(event.type, {sourceEvent: event}, {
-          node: this,
-          bubbles: event.bubbles,
-          cancelable: event.cancelable
-        });
-      }
-    }
-
-  };
-
-  Polymer.PaperInputBehaviorLightImpl = {
-
-    properties: {
       /**
        * Returns true if the value is invalid. Bind this to both the `<paper-input-container>`'s
        * and the input's `invalid` property.
@@ -411,17 +316,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Just set the value and give up on the caret.
         this.value = newValue;
       }
-    }
+    },
+
+    attached: function() {
+      this._ariaDescribedBy = '';
+      this._updateAriaLabelledBy();
+    },
+
+    _updateAriaLabelledBy: function() {
+      var label = Polymer.dom(this.root).querySelector('label');
+      if (!label) {
+        this._ariaLabelledBy = '';
+        return;
+      }
+      var labelledBy;
+      if (label.id) {
+        labelledBy = label.id;
+      } else {
+        labelledBy = 'paper-input-label-' + new Date().getUTCMilliseconds();
+        label.id = labelledBy;
+      }
+      this._ariaLabelledBy = labelledBy;
+    },
+
+    _computeAlwaysFloatLabel: function(alwaysFloatLabel, placeholder) {
+      return placeholder || alwaysFloatLabel;
+    },
   };
 
   Polymer.PaperInputBehaviorHeavyImpl = {
     listeners: {
       'addon-attached': '_onAddonAttached'
     },
-
-    observers: [
-      '_focusedControlStateChanged(focused)'
-    ],
+    //
+    // observers: [
+    //   '_focusedControlStateChanged(focused)'
+    // ],
 
     _onAddonAttached: function(event) {
       var target = event.path ? event.path[0] : event.target;
@@ -434,36 +364,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     },
 
-    _focusedControlStateChanged: function(focused) {
-      // IronControlState stops the focus and blur events in order to redispatch them on the host
-      // element, but paper-input-container listens to those events. Since there are more
-      // pending work on focus/blur in IronControlState, I'm putting in this hack to get the
-      // input focus state working for now.
-      if (!this.$.container) {
-        this.$.container = Polymer.dom(this.root).querySelector('paper-input-container');
-        if (!this.$.container) {
-          return;
-        }
-      }
-      if (focused) {
-        this.$.container._onFocus();
-      } else {
-        this.$.container._onBlur();
-      }
-    },
+    // _focusedControlStateChanged: function(focused) {
+    //   // IronControlState stops the focus and blur events in order to redispatch them on the host
+    //   // element, but paper-input-container listens to those events. Since there are more
+    //   // pending work on focus/blur in IronControlState, I'm putting in this hack to get the
+    //   // input focus state working for now.
+    //   if (!this.$.container) {
+    //     this.$.container = Polymer.dom(this.root).querySelector('paper-input-container');
+    //     if (!this.$.container) {
+    //       return;
+    //     }
+    //   }
+    //   if (focused) {
+    //     this.$.container._onFocus();
+    //   } else {
+    //     this.$.container._onBlur();
+    //   }
+    // },
 
   };
 
   /** @polymerBehavior */
-  Polymer.PaperInputBehavior = [Polymer.IronControlState,
-                                Polymer.PaperInputBehaviorTinyImpl,
-                                Polymer.PaperInputBehaviorLightImpl,
+  Polymer.PaperInputLightBehavior = [Polymer.PaperInputTinyBehavior,
+                                    Polymer.PaperInputBehaviorLightImpl];
+  Polymer.PaperInputBehavior = [Polymer.PaperInputLightBehavior,
                                 Polymer.PaperInputBehaviorHeavyImpl];
-  Polymer.PaperInputLightBehavior = [Polymer.IronControlState,
-                                     Polymer.PaperInputBehaviorTinyImpl,
-                                     Polymer.PaperInputBehaviorLightImpl];
- Polymer.PaperInputTinyBehavior = [Polymer.IronControlState,
-                                    Polymer.PaperInputBehaviorTinyImpl];
+
 
 
 

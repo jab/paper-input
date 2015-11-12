@@ -8,12 +8,11 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-input/iron-input.html">
-<link rel="import" href="paper-input-behavior.html">
+<link rel="import" href="paper-input-tiny-behavior.html">
 <link rel="import" href="paper-input-container-shared-styles.html">
 
 <dom-module id="paper-input-tiny">
-  <template>
+  <template strip-whitespace>
     <style include="paper-input-container-shared-styles"></style>
     <style>
       :host {
@@ -31,13 +30,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="floated-label-placeholder" hidden$="[[noLabelFloat]]">&nbsp;</div>
 
     <div class="input-content">
-      <label hidden$="[[!label]]" class$="[[_computeLabelClass(noLabelFloat,alwaysFloatLabel,focused,_hasContent)]]">[[label]]</label>
-      <input is="iron-input" id="input"
-        aria-labelledby$="[[_ariaLabelledBy]]"
-        aria-describedby$="[[_ariaDescribedBy]]"
+      <label hidden$="[[!label]]"
+             class$="[[_computeLabelClass(noLabelFloat,alwaysFloatLabel,focused,_hasContent)]]">[[label]]</label>
+      <input id="input"
+        aria-label$="[[ariaLabel]]"
         disabled$="[[disabled]]"
-        bind-value="{{value}}"
-        type$="[[type]]"
+        value="[[value]]"
         placeholder$="[[placeholder]]"
         on-change="_onChange">
     </div>
@@ -58,27 +56,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Polymer.PaperInputTinyBehavior
     ],
 
-    // beforeRegister: function() {
-    //   // Use a paper-input template.
-    //   var template =
-    //       Polymer.DomModule.import('paper-input--light-template', 'template').cloneNode(true);
-    //   this._template = template;
-    // },
-
-    ready: function() {
-      this.addEventListener('input', this._onInput);
-      this._inputElement = Polymer.dom(this).querySelector('input');
-    },
-
     attached: function() {
       this._onInput();
+
+      // Don't stomp over the user set aria label.
+      if (!this.getAttribute('aria-label')) {
+        this.setAttribute('aria-label', this.label);
+      }
     },
 
     _onInput: function() {
       var value = this.$.input.value;
-
-      // type="number" hack needed because this.value is empty until it's valid
-      if (value || value === 0 || (this.$.input.type === 'number' && !this.$.input.checkValidity())) {
+      if (value || value === 0 || (!!this.placeholder && !this.value)) {
         this._hasContent = true;
       } else {
         this._hasContent = false;
@@ -87,12 +76,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _computeLabelClass: function(noLabelFloat,alwaysFloatLabel,focused,hasContent) {
       var cls = '';
-
-      if (noLabelFloat) {
+      if (noLabelFloat === true) {
         return hasContent ? 'label-is-hidden' : '';
       }
 
-      if (hasContent || alwaysFloatLabel) {
+      if (hasContent || alwaysFloatLabel === true) {
         cls += ' label-is-floating';
         if (focused) {
           cls += " label-is-highlighted";
